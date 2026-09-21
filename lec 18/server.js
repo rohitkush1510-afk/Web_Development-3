@@ -1,0 +1,33 @@
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+app.use(express.json());
+
+app.get('/age-check/:age', (req, res,next) => {
+    let age = parseInt(req.params.age);
+    // console.log(age)
+    try{
+    if(age < 18) {
+        throw new Error("You are not eligible to vote");
+    }else{
+        res.send("You are eligible to vote");
+    }
+}catch(error){
+    // res.status(400).json({success: false, message: error.message});
+    next(error)
+}
+});
+ 
+app.use((err, req, res, next) => {      //error middleware
+    console.error(err.stack);
+    res.status(500).json({success: false, message: err.message});
+});
+
+app.use((req,res,next) => { //invalid route middleware
+    res.status(404).json({success: false, message: "Route not found"});
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
